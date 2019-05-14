@@ -11,7 +11,7 @@ def get_lstm(units):
     Build LSTM Model.
 
     # Arguments
-        units: List(int), number of input, output and hidden units.
+        units: List(int), number of input, output and hidden units.unit[0] = 12, unit[1] = 64  unit[2] = 64  unit[3] = 1
     # Returns
         model: Model, nn model.
     """

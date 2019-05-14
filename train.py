@@ -31,7 +31,7 @@ def train_model(model, X_train, y_train, name, config):
         X_train, y_train,
         batch_size=config["batch"],
         epochs=config["epochs"],
-        validation_split=0.05)
+        validation_split=0.05)  # 训练中
 
     model.save('model/' + name + '.h5')
     df = pd.DataFrame.from_dict(hist.history)
@@ -61,6 +61,7 @@ def train_seas(models, X_train, y_train, name, config):
             temp = hidden_layer_model.predict(temp)
 
         m = models[i]
+        # 损失函数为 mse 均方误差  优化器 rmsprop  指标列表metrics：平均绝对百分比误差 ，缩写MAPE。
         m.compile(loss="mse", optimizer="rmsprop", metrics=['mape'])
 
         m.fit(temp, y_train, batch_size=config["batch"],
