@@ -82,29 +82,29 @@ def main(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model",
-        default="saes_mag",
+        default="lstm_Vehicle",
         help="Model to train.")
     args = parser.parse_args()
 
-    lag = 12
-    config = {"batch": 256, "epochs": 150}
-    file1 = 'data/train_mag.csv'
-    file2 = 'data/test_mag.csv'
+    lag = 16
+    config = {"batch": 64, "epochs": 50}
+    file1 = 'data/VehicleCount_Train.csv'
+    file2 = 'data/VehicleCount_Test.csv'
     X_train, y_train, _, _, _ = process_data(file1, file2, lag)
 
-    if args.model == 'lstm_mag':
+    if args.model == 'lstm_Vehicle':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_lstm([12, 64, 64, 1])
+        m = model.get_lstm([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'gru_mag':
+    if args.model == 'gru_Vehicle':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
-        m = model.get_gru([12, 64, 64, 1])
+        m = model.get_gru([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'saes_mag':
+    if args.model == 'saes_Vehicle':
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
-        m = model.get_saes([12, 400, 400, 400, 1])
+        m = model.get_saes([lag, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+     main(sys.argv)

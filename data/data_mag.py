@@ -26,8 +26,8 @@ def process_data(train, test, lags):
     attr = 'vehicleCount'
     df1 = pd.read_csv(train, encoding='utf-8').fillna(0)
     df2 = pd.read_csv(test, encoding='utf-8').fillna(0)
-    df1[attr] = movingaverage(data=df1[attr].values, window_size=5)
-    df2[attr] = movingaverage(data=df2[attr].values, window_size=5)
+    # df1[attr] = movingaverage(data=df1[attr].values, window_size=5)
+    # df2[attr] = movingaverage(data=df2[attr].values, window_size=5)
     # scaler = StandardScaler().fit(df1[attr].values)
     scaler = MinMaxScaler(feature_range=(0, 1)).fit(df1[attr].values.reshape(-1, 1))   # 对每一列数据归一化 到 【0，1】
     flow1 = scaler.transform(df1[attr].values.reshape(-1, 1)).reshape(1, -1)[0]

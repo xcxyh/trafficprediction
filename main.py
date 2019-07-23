@@ -72,7 +72,7 @@ def plot_results(y_true, y_preds, names):
         names: List, Method names.
     """
     d = '2018/12/18 0:00'
-    x = pd.date_range(d, periods=562, freq='5min')
+    x = pd.date_range(d, periods=274, freq='5min')
 
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -102,9 +102,7 @@ def main():
     gru = load_model('model/gru_mag.h5')
     saes = load_model('model/saes_mag.h5')
     models = [lstm, gru, saes]
-    names = ['LSTM', 'GRU', 'SAEs','galwlr']
-    dataset = pd.read_csv('data/test_1617.csv', usecols=[2,3], engine='python', skipfooter=3)
-    dataset['vehicleCount_pre'] = movingaverage(data=dataset['vehicleCount_pre'].values, window_size=5)
+    names = ['LSTM', 'GRU', 'SAEs']
     lag = 12
     file1 = 'data/train_mag.csv'
     file2 = 'data/test_1617.csv'
@@ -125,7 +123,6 @@ def main():
         print(name)
         eva_regress(y_test, predicted)
 
-    y_preds.append(dataset['vehicleCount_pre'][9:])
     plot_results(y_test[:], y_preds, names)
 
 
