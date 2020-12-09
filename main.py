@@ -10,7 +10,7 @@ import sklearn.metrics as metrics
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from scipy import stats
-from sklearn.externals import joblib
+import joblib
 
 from preprocess_data.data import process_data
 
@@ -124,8 +124,9 @@ def plot_results(y_true, y_preds, names,linestyles):
     date_format = mpl.dates.DateFormatter("%H:%M")
     ax.xaxis.set_major_formatter(date_format)
     fig.autofmt_xdate()
-
     plt.show()
+
+
 
 def movingaverage(data, window_size):
     window = np.ones(int(window_size))/float(window_size)
@@ -134,7 +135,7 @@ def movingaverage(data, window_size):
 
 def main():
     lag = 64  # 16 32 64
-    gap = 5  # 2 5
+    gap = 5  # 0 2 5
     lstm = load_model('model_old/lstm_Vehicle_lag{}.h5'.format(lag))
     a_lstm = load_model('model_old/lstm_Vehicle_attention_lag{}.h5'.format(lag))
     svr = joblib.load('model/{}lag{}gap_svr.pkl'.format(lag, gap))
