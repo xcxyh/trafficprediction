@@ -9,7 +9,9 @@ import pandas as pd
 from data.data_mag import process_data
 from model import model
 from keras.models import Model
-from keras.callbacks import EarlyStopping
+
+
+from sklearn.externals import joblib
 warnings.filterwarnings("ignore")
 
 
@@ -79,32 +81,41 @@ def train_seas(models, X_train, y_train, name, config):
 
 
 def main(argv):
+    lag = 64  # 16 32 64
+    gap = 5  # 2 5
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--model",
-        default="lstm_Vehicle",
+        default="svr_gap{}_lag_{}".format(gap, lag),
         help="Model to train.")
     args = parser.parse_args()
+    config = {"batch": 64, "epochs": 10}
+    file1 = 'data_old/VehicleCount_Train_workday.csv'
+    file2 = 'data_old/VehicleCount_Test_workday.csv'
+    X_train, y_train, _, _, _ = process_data(file1, file2, lag, gap)
 
-    lag = 16
-    config = {"batch": 64, "epochs": 50}
-    file1 = 'data/VehicleCount_Train.csv'
-    file2 = 'data/VehicleCount_Test.csv'
-    X_train, y_train, _, _, _ = process_data(file1, file2, lag)
-
-    if args.model == 'lstm_Vehicle':
+    if args.model == 'lstm_gap{}_lag_{}'.format(gap, lag):
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_lstm([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'gru_Vehicle':
+    if args.model == 'attentionlstm_gap{}_lag_{}'.format(gap, lag):
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
+        m = model.get_attention_lstm([lag, 64, 64, 1])
+        train_model(m, X_train, y_train, args.model, config)
+    if args.model == 'gru_gap{}_lag_{}'.format(gap, lag):
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1], 1))
         m = model.get_gru([lag, 64, 64, 1])
         train_model(m, X_train, y_train, args.model, config)
-    if args.model == 'saes_Vehicle':
+    if args.model == 'saes_gap{}_lag_{}'.format(gap, lag):
         X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
         m = model.get_saes([lag, 400, 400, 400, 1])
         train_seas(m, X_train, y_train, args.model, config)
-
+    if args.model == 'svr_gap{}_lag_{}'.format(gap, lag):
+        X_train = np.reshape(X_train, (X_train.shape[0], X_train.shape[1]))
+        m = model.get_svr(2, 0.1)
+        m.fit(X_train, y_train)
+        # 保存成sklearn自带的文件格式
+        joblib.dump(m, 'model/' + str(lag) + 'lag' + str(gap) + 'gap_' + 'svr.pkl')
 
 if __name__ == '__main__':
      main(sys.argv)
