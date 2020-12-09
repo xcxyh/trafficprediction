@@ -10,7 +10,6 @@ from keras.models import Model
 import joblib
 
 import model
-from preprocess_data.data import process_data
 
 warnings.filterwarnings("ignore")
 

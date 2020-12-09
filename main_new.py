@@ -6,18 +6,11 @@ Created on 2020/12/9 14:11
 import argparse
 import numpy as np
 from sklearn.preprocessing import MinMaxScaler
-
 import model
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from main import eva_regress
-from train import train_model
-
-
-def movingaverage(data, window_size):
-    window = np.ones(int(window_size))/float(window_size)
-    return np.convolve(data, window, 'same')
+from error_evaluate import print_error_eval
 
 
 def plot_result(y_true, y_pred, name):
@@ -35,6 +28,11 @@ def plot_result(y_true, y_pred, name):
     ax.xaxis.set_major_formatter(date_format)
     fig.autofmt_xdate()
     plt.show()
+
+
+def movingaverage(data, window_size):
+    window = np.ones(int(window_size))/float(window_size)
+    return np.convolve(data, window, 'same')
 
 
 def generate_train_test(data_set, len_test, input_len, lag):
@@ -59,6 +57,21 @@ def generate_train_test(data_set, len_test, input_len, lag):
     print('X_test shape: {}'.format(X_test.shape))
     print('Y_test shape: {}'.format(Y_test.shape))
     return X_train, Y_train, X_test, Y_test, scaler
+
+
+def train_model(model, X_train, y_train, name, config):
+    model.compile(loss="mse", optimizer="adadelta", metrics=['mape'])
+    # early = EarlyStopping(monitor='val_loss', patience=30, verbose=0, mode='auto')
+    hist = model.fit(
+        X_train, y_train,
+        batch_size=config["batch"],
+        epochs=config["epochs"],
+        validation_split=0.1)  # 训练中
+
+    model.save('models/' + name + '.h5')
+    # df = pd.DataFrame.from_dict(hist.history)
+    # df.to_csv('models/' + name + ' loss.csv', encoding='utf-8', index=False)
+    return model
 
 
 def train_and_save():
@@ -97,7 +110,7 @@ def train_and_save():
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1)).reshape(1, -1)[0]
     y_pred = scaler.inverse_transform(y_pred.reshape(-1, 1)).reshape(1, -1)[0]
 
-    eva_regress(y_test, y_pred)
+    print_error_eval(y_test, y_pred)
     plot_result(y_test, y_pred, model_name)
 
 
